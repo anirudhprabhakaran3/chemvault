@@ -1,0 +1,22 @@
+docker run \
+  --name fief-server \
+  -p 8000:8000 \
+  -d \
+  -e "SECRET=CyOF8ozOcQkFs-wlYAJAUYYaESS45J33qP0tVKeiinbq7JCJz_9jBO17vF9B9_HxLbBHV2UwXIw5kCKywzdZzA" \
+  -e "FIEF_CLIENT_ID=qC6rls-8IbsqUqmyikIcuUB2HAXEZBtPFBe9NxCxBUo" \
+  -e "FIEF_CLIENT_SECRET=RT4NuYXN-AfOUcwbjOMvxnEh6kzb1cIW_IDn7wO7pSw" \
+  -e "ENCRYPTION_KEY=_GeubFTP9m1nU2Zmvpn4wvQru9sZmHL7mSeeUUdbmxw=" \
+  -e "PORT=8000" \
+  -e "ROOT_DOMAIN=localhost:8000" \
+  -e "FIEF_DOMAIN=localhost:8000" \
+  -e "FIEF_MAIN_USER_EMAIL=admin@chemvault.com" \
+  -e "FIEF_MAIN_USER_PASSWORD=ChemVaultAdmin" \
+  -e "CSRF_COOKIE_SECURE=False" \
+  -e "SESSION_DATA_COOKIE_SECURE=False" \
+  -e "USER_LOCALE_COOKIE_SECURE=False" \
+  -e "LOGIN_HINT_COOKIE_SECURE=False" \
+  -e "LOGIN_SESSION_COOKIE_SECURE=False" \
+  -e "REGISTRATION_SESSION_COOKIE_SECURE=False" \
+  -e "SESSION_COOKIE_SECURE=False" \
+  -e "FIEF_ADMIN_SESSION_COOKIE_SECURE=False" \
+  ghcr.io/fief-dev/fief:latest

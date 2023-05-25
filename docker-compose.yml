@@ -1,0 +1,47 @@
+version: "3"
+
+services:
+  fief-server:
+    image: ghcr.io/fief-dev/fief:latest
+    command: fief run-server --port 9000
+    ports:
+      - 9000:9000
+    env_file:
+      - .env
+    restart: unless-stopped
+    networks:
+      - entirenetwork
+
+  fief-worker:
+    image: ghcr.io/fief-dev/fief:latest
+    command: fief run-worker -p 1 -t 1
+    env_file:
+      - .env
+    networks:
+      - entirenetwork
+
+  postgres:
+    image: postgres:alpine
+    environment:
+      - POSTGRES_PASSWORD=fief
+      - POSTGRES_USER=fief
+      - POSTGRES_DB=fief
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - entirenetwork
+
+  redis:
+    image: redis:alpine
+    command: redis-server --save 60 1 --loglevel warning
+    volumes:
+      - redis-data:/data
+    networks:
+      - entirenetwork
+
+volumes:
+  redis-data:
+  postgres-data:
+
+networks:
+  entirenetwork:
