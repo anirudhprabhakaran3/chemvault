@@ -2,7 +2,7 @@ version: "3"
 
 services:
   fief-server:
-    image: ghcr.io/fief-dev/fief:latest
+    image: ghcr.io/fief-dev/fief:0.25.3
     command: fief run-server --port 9000
     ports:
       - 9000:9000
