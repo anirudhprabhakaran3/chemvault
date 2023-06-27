@@ -1,47 +1,49 @@
-version: "3"
-
+version: '3.8'
 services:
-  fief-server:
-    image: ghcr.io/fief-dev/fief:0.25.3
-    command: fief run-server --port 9000
-    ports:
-      - 9000:9000
-    env_file:
-      - .env
-    restart: unless-stopped
-    networks:
-      - entirenetwork
 
-  fief-worker:
-    image: ghcr.io/fief-dev/fief:latest
-    command: fief run-worker -p 1 -t 1
-    env_file:
-      - .env
+  nginx:
+    image: nginx
+    ports:
+      - 80:80
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      keycloak:
+        condition: service_healthy
     networks:
-      - entirenetwork
+      - proxy_network
+
+  keycloak:
+    image: jboss/keycloak
+    environment:
+      - KEYCLOAK_USER=${KEYCLOAK_USER}
+      - KEYCLOAK_PASSWORD=${KEYCLOAK_PASSWORD}
+      - DB_VENDOR=${KEYCLOAK_DB_VENDOR}
+      - DB_ADDR=${KEYCLOAK_DB_ADDR}
+      - DB_PORT=${KEYCLOAK_DB_PORT}
+      - DB_DATABASE=${KEYCLOAK_DB_DATABASE}
+      - DB_USER=${KEYCLOAK_DB_USER}
+      - DB_PASSWORD=${KEYCLOAK_DB_PASSWORD}
+    depends_on:
+      - postgres
+    networks:
+      - proxy_network
+      - keycloak_network
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail http://localhost:8080/auth/realms/master"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   postgres:
-    image: postgres:alpine
+    image: postgres
     environment:
-      - POSTGRES_PASSWORD=fief
-      - POSTGRES_USER=fief
-      - POSTGRES_DB=fief
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - POSTGRES_DB=${KEYCLOAK_DB_DATABASE}
+      - POSTGRES_USER=${KEYCLOAK_DB_USER}
+      - POSTGRES_PASSWORD=${KEYCLOAK_DB_PASSWORD}
     networks:
-      - entirenetwork
-
-  redis:
-    image: redis:alpine
-    command: redis-server --save 60 1 --loglevel warning
-    volumes:
-      - redis-data:/data
-    networks:
-      - entirenetwork
-
-volumes:
-  redis-data:
-  postgres-data:
+      - keycloak_network
 
 networks:
-  entirenetwork:
+  keycloak_network:
+  proxy_network:
